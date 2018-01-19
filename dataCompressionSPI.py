@@ -21,8 +21,8 @@ def main():
    # Indefinetely read data from SPI
    while (True):
       # Read two bytes off of SPI and them coerce
-      spiData = spi.xfer([0xFF, 0xFF])
-      data = (spiData[0] << 8) + spiData[1]
+      spiData = spi.xfer([0xFF])
+      data = spiData[0] * 4
       dataTime = datetime.datetime.now()
 
       # If the data is between either the upper or lower range, then we want 
