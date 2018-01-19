@@ -7,22 +7,26 @@ def main():
    oldDataTime = datetime.datetime.now()
    repeatingValues = 0
 
+   lowerBound = 0
+   upperBound = 1024
+   boundOffset = 20
+
    # Open the file to write data to
    dataFile = open("data", "w")
    
-   # Indefintely read data in (from SPI, or just a num generator)
+   # Indefintely read data in 
    while (True):
-      # Generate a random value (this will be SPI in the real deal)
-      data = round(random.uniform(-0.5, 5.5), 1)
+      # Generate a random value 
+      data = random.randint(lowerBound, upperBound + 1)
       dataTime = datetime.datetime.now()
 
       # If the data is between either the upper or lower range, then we want 
       # to set data to the respective value in order to eliminate minor 
       # deviations when the signal is either high or low. 
-      if (data >= -0.1 and data <= 0.1):
-         data = 0
-      elif (data >= 4.9 and data <= 5.1):
-         data = 5
+      if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
+         data = lowerBound
+      elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
+         data = upperBound
 
       # If the current data is equal the previously acquired data, then we want
       # to increase the counter of repeating values
