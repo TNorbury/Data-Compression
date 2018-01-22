@@ -14,18 +14,21 @@ def main():
         # Split the line into three parts: number of repeating values, the data,
         # and the time the data was read
         lineSplit = line.split()
-        repeatingValues = int(lineSplit[0])
-        data = lineSplit[1]
-        dataTime = lineSplit[2]
 
-        # Now for each of the repeating values, write the data, along with the
-        # timestamp, to the file
-        for i in range(0, repeatingValues):
-            decompressedFile.write(data + "," + dataTime + "\n")
+        # If the line didn't have 3 sections, then don't write anything
+        if (len(lineSplit) != 3):
+            repeatingValues = int(lineSplit[0])
+            data = lineSplit[1]
+            dataTime = lineSplit[2]
+
+            # Now for each of the repeating values, write the data, along with the
+            # timestamp, to the file
+            for i in range(0, repeatingValues):
+                decompressedFile.write(data + "," + dataTime + "\n")
 
     compressedFile.close()
     decompressedFile.close()
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
