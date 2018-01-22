@@ -10,6 +10,12 @@ def main():
    lowerBound = 0
    upperBound = 1024
    boundOffset = 20
+   
+   # The signal needs to be within the upper/lower bound for a certain number
+   # of iterations before changing values
+   inBoundIterations = 0
+   MAX_ITERATIONS = 5
+   inBound = True
 
    # Open the file to write data to
    dataFile = open("data", "w")
@@ -24,9 +30,20 @@ def main():
       # to set data to the respective value in order to eliminate minor 
       # deviations when the signal is either high or low. 
       if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
-         data = lowerBound
+         inBound = True
+         inBoundIterations += 1
+         if (inBoundIterations == MAX_ITERATIONS):
+            data = lowerBound
+
       elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
-         data = upperBound
+         inBound = True
+         inBoundIterations += 1
+         if (inBoundIterations == MAX_ITERATIONS):
+            data = upperBound
+
+      else:
+         inBound = False
+         inBoundIterations = 0
 
       # If the current data is equal the previously acquired data, then we want
       # to increase the counter of repeating values
