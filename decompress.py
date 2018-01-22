@@ -16,7 +16,7 @@ def main():
         lineSplit = line.split()
 
         # If the line didn't have 3 sections, then don't write anything
-        if (len(lineSplit) != 3):
+        if (len(lineSplit) == 3):
             repeatingValues = int(lineSplit[0])
             data = lineSplit[1]
             dataTime = lineSplit[2]
