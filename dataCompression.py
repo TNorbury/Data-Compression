@@ -1,7 +1,6 @@
 import datetime
 import math
 import random
-import spidev
 import sys
 
 def main():
@@ -26,10 +25,11 @@ def main():
    
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (len(sys.argv) == 1 or sys.argv[1] == "SPI"):
+      import spidev
       useRand = False
       spi = spidev.SpiDev()
       spi.open(0,0)
-   elif (len(sys.argv) == 2 and sys.argv[2] == "rand"):
+   elif (len(sys.argv) == 2 and sys.argv[1] == "rand"):
       useRand = True
 
    # Indefinetely read data from SPI
