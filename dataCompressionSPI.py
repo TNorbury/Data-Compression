@@ -2,11 +2,9 @@ import datetime
 import math
 import random
 import spidev
+import sys
 
 def main():
-   spi = spidev.SpiDev()
-   spi.open(0,0)
-
    oldData = 0
    oldDataTime = datetime.datetime.now()
    repeatingValues = 0
@@ -22,12 +20,29 @@ def main():
 
    # Open the file to write data to
    dataFile = open("data", "w")
+
+   useRand = False;
    
+   # If the SPI argument was given, or no argument at all, then get data off of the SPI.
+   if (len(sys.argv) == 1 || sys.argv[1] == "SPI"):
+      useRand = False
+      spi = spidev.SpiDev()
+      spi.open(0,0)
+   elif (len(sys.argv) == 2 && sys.argv[2] == "rand"):
+      useRand = True
+
    # Indefinetely read data from SPI
    while (True):
-      # Read two bytes off of SPI and them coerce
-      spiData = spi.xfer([0xFF])
-      data = spiData[0] * 4
+         
+      if (useRand == True):
+         # Get random values
+         data = random.randint(lowerBound, upperBound + 1)
+
+      else:
+         # Read a byte from SPI and multiply it by 4 to get the full value
+         spiData = spi.xfer([0xFF])
+         data = spiData[0] * 4
+
       dataTime = datetime.datetime.now()
 
       # If the data is between either the upper or lower range, then we want 
