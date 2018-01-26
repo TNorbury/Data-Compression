@@ -25,11 +25,11 @@ def main():
    processData = True
    
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
-   if (len(sys.argv) == 1 || sys.argv[1] == "SPI"):
+   if (len(sys.argv) == 1 or sys.argv[1] == "SPI"):
       useRand = False
       spi = spidev.SpiDev()
       spi.open(0,0)
-   elif (len(sys.argv) == 2 && sys.argv[2] == "rand"):
+   elif (len(sys.argv) == 2 and sys.argv[2] == "rand"):
       useRand = True
 
    # Indefinetely read data from SPI
