@@ -22,6 +22,7 @@ def main():
    dataFile = open("data", "w")
 
    useRand = False;
+   processData = True
    
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (len(sys.argv) == 1 || sys.argv[1] == "SPI"):
@@ -33,7 +34,6 @@ def main():
 
    # Indefinetely read data from SPI
    while (True):
-         
       if (useRand == True):
          # Get random values
          data = random.randint(lowerBound, upperBound + 1)
@@ -41,45 +41,52 @@ def main():
       else:
          # Read a byte from SPI and multiply it by 4 to get the full value
          spiData = spi.xfer([0xFF])
-         data = spiData[0] * 4
 
-      dataTime = datetime.datetime.now()
+         # If the "ignore" value was sent. If it was, then don't process the data.
+         if (spiData[0] == 0xFF):
+            processData = False
+         else:
+            processData = True
+            data = spiData[0] * 4
 
-      # If the data is between either the upper or lower range, then we want 
-      # to set data to the respective value in order to eliminate minor 
-      # deviations when the signal is either high or low. 
-      if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
-         inBoundIterations += 1
-         if (inBoundIterations == MAX_ITERATIONS):
-            data = lowerBound
+      if (processData == True):
+         dataTime = datetime.datetime.now()
 
-      elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
-         inBoundIterations += 1
-         if (inBoundIterations == MAX_ITERATIONS):
-            data = upperBound
+         # If the data is between either the upper or lower range, then we want 
+         # to set data to the respective value in order to eliminate minor 
+         # deviations when the signal is either high or low. 
+         if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
+            inBoundIterations += 1
+            if (inBoundIterations == MAX_ITERATIONS):
+               data = lowerBound
 
-      else:
-         inBoundIterations = 0
+         elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
+            inBoundIterations += 1
+            if (inBoundIterations == MAX_ITERATIONS):
+               data = upperBound
 
-      # If the current data is equal the previously acquired data, then we want
-      # to increase the counter of repeating values
-      if (data == oldData):
-         repeatingValues += 1
+         else:
+            inBoundIterations = 0
 
-      # Otherwise, if the current data is equal to the last data, then we want
-      # to write the previous data to the file and set the previous data to 
-      # our current data
-      elif (data != oldData):
-         # If this is the first data that's been read, then don't write 
-         # anything to the file
-         if (repeatingValues != 0):
-            dataFile.write(str(repeatingValues) + " " + str(oldData) + " " 
-            + oldDataTime.strftime("%I:%M:%S.%f") + "\n")
+         # If the current data is equal the previously acquired data, then we want
+         # to increase the counter of repeating values
+         if (data == oldData):
+            repeatingValues += 1
 
-         # Reset the number of repeating values, and set the current data as the old data
-         repeatingValues = 1
-         oldData = data
-         oldDataTime = dataTime
+         # Otherwise, if the current data is equal to the last data, then we want
+         # to write the previous data to the file and set the previous data to 
+         # our current data
+         elif (data != oldData):
+            # If this is the first data that's been read, then don't write 
+            # anything to the file
+            if (repeatingValues != 0):
+               dataFile.write(str(repeatingValues) + " " + str(oldData) + " " 
+               + oldDataTime.strftime("%I:%M:%S.%f") + "\n")
+
+            # Reset the number of repeating values, and set the current data as the old data
+            repeatingValues = 1
+            oldData = data
+            oldDataTime = dataTime
 
 
 if __name__ == "__main__":
