@@ -20,6 +20,9 @@ def main():
    # Open the file to write data to
    dataFile = open("data", "w")
 
+   # Open a file to write debug values to
+   debugFile = open("debugData", "w")
+
    useRand = False;
    processData = True
    
@@ -51,6 +54,10 @@ def main():
 
       if (processData == True):
          dataTime = datetime.datetime.now()
+
+         # Write the data and time to the debug file
+         debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+
 
          # If the data is between either the upper or lower range, then we want 
          # to set data to the respective value in order to eliminate minor 
