@@ -1,38 +1,61 @@
+import argparse
 import datetime
 import math
 import random
 import sys
 
 def main():
+   # Create the argument parser
+   parser = argparse.ArgumentParser(description="Read values off of the SPI and compress the data")
+   parser.add_argument("--lowerBound", dest="lowerBound", nargs='?', 
+      metavar="lowerBound", default=0, type=int, 
+      help="Set the lower bound of the signal. When using random values, this will be the min random value. Default=0")
+   parser.add_argument("--upperBound", dest="upperBound", nargs='?',
+      metavar="upperBound", default=1024, type=int, 
+      help="Set the upper bound of the signal. When using random values, this will be the max random value. Default=1024")
+   parser.add_argument("--boundOffset", dest="boundOffset", nargs='?',
+      metavar="boundOffset", default=20, type=int,
+      help="The offset from the upper/lower bound where data will be compressed. Default=20")
+   parser.add_argument("--randValues", dest="randValues", action="store_true", 
+      help="Use random values, insteads of reading off the SPI")
+   parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
+      metavar="debugOutput", default="debugData", type=argparse.FileType('w'), 
+      help="Output files that contains the  original values of all data collected. Default='debugOupt'")
+   parser.add_argument("--outputFile", dest="outputFile", nargs='?',
+      metavar="outputFile", default="data", type=argparse.FileType('w'),
+      help="File where collected data will be written to. Default='data'")
+
+   args = parser.parse_args()
+
+   lowerBound = args.lowerBound
+   upperBound = args.upperBound
+   boundOffset = args.boundOffset
+
+   # Open the file to write data to
+   dataFile = args.outputFile
+
+   # Open a file to write debug values to
+   debugFile = args.debugOutput
+
+   useRand = args.randValues;
+   processData = True
+   
    oldData = 0
    oldDataTime = datetime.datetime.now()
    repeatingValues = 0
-
-   lowerBound = 0
-   upperBound = 1024
-   boundOffset = 20
 
    # The signal needs to be within the upper/lower bound for a certain number
    # of iterations before changing values
    inBoundIterations = 0
    MAX_ITERATIONS = 5
 
-   # Open the file to write data to
-   dataFile = open("data", "w")
-
-   # Open a file to write debug values to
-   debugFile = open("debugData", "w")
-
-   useRand = False;
-   processData = True
-   
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
-   if (len(sys.argv) == 1 or sys.argv[1] == "SPI"):
+   if (not useRand):
       import spidev
       useRand = False
       spi = spidev.SpiDev()
       spi.open(0,0)
-   elif (len(sys.argv) == 2 and sys.argv[1] == "rand"):
+   elif (useRand):
       useRand = True
 
    # Indefinetely read data from SPI
@@ -57,7 +80,6 @@ def main():
 
          # Write the data and time to the debug file
          debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
-
 
          # If the data is between either the upper or lower range, then we want 
          # to set data to the respective value in order to eliminate minor 
