@@ -87,12 +87,12 @@ def main():
          # deviations when the signal is either high or low. 
          if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
             inBoundIterations += 1
-            if (inBoundIterations == MAX_ITERATIONS):
+            if (inBoundIterations >= MAX_ITERATIONS):
                data = lowerBound
 
          elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
             inBoundIterations += 1
-            if (inBoundIterations == MAX_ITERATIONS):
+            if (inBoundIterations >= MAX_ITERATIONS):
                data = upperBound
 
          else:
