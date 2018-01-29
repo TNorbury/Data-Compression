@@ -19,7 +19,7 @@ def main():
    parser.add_argument("--randValues", dest="randValues", action="store_true", 
       help="Use random values, insteads of reading off the SPI")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
-      metavar="debugOutput", default="debugData", type=argparse.FileType('w'), 
+      metavar="debugOutput", type=argparse.FileType('w'), 
       help="Output files that contains the  original values of all data collected. Default='debugOupt'")
    parser.add_argument("--outputFile", dest="outputFile", nargs='?',
       metavar="outputFile", default="data", type=argparse.FileType('w'),
@@ -78,8 +78,9 @@ def main():
       if (processData == True):
          dataTime = datetime.datetime.now()
 
-         # Write the data and time to the debug file
-         debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+         # If a debug file is being used write the data and time to it
+         if (not debugFile is None):
+            debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
          # If the data is between either the upper or lower range, then we want 
          # to set data to the respective value in order to eliminate minor 
