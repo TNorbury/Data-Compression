@@ -51,6 +51,10 @@ def main():
    inBoundIterations = 0
    MAX_ITERATIONS = 5
 
+   # If the data is in the threshold then buffer it
+   thresholdBuffer = list()
+   inThreshold = False
+
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
       import spidev
@@ -62,20 +66,26 @@ def main():
 
    # Indefinetely read data from SPI
    while (True):
-      if (useRand == True):
-         # Get random values
-         data = random.randint(lowerBound, upperBound + 1)
-
+      # If outside of the threshold, and there are still values left in the threshold
+      # then get data from the buffer, and not the normal way
+      if (not inThreshold):
+         data = thresholdBuffer.pop()
+         processData = True
       else:
-         # Read a byte from SPI and multiply it by 4 to get the full value
-         spiData = spi.xfer([0xFF])
+         if (useRand == True):
+            # Get random values
+            data = random.randint(lowerBound, upperBound + 1)
 
-         # If the "ignore" value was sent. If it was, then don't process the data.
-         if (spiData[0] == 0xFF):
-            processData = False
          else:
-            processData = True
-            data = spiData[0] * 4
+            # Read a byte from SPI and multiply it by 4 to get the full value
+            spiData = spi.xfer([0xFF])
+
+            # If the "ignore" value was sent. If it was, then don't process the data.
+            if (spiData[0] == 0xFF):
+               processData = False
+            else:
+               processData = True
+               data = spiData[0] * 4
 
       if (processData == True):
          dataTime = datetime.datetime.now()
