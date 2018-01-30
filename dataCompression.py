@@ -7,6 +7,8 @@ import sys
 def main():
    # Create the argument parser
    parser = argparse.ArgumentParser(description="Read values off of the SPI and compress the data")
+
+   # Add arguments to the parser
    parser.add_argument("--lowerBound", dest="lowerBound", nargs='?', 
       metavar="lowerBound", default=0, type=int, 
       help="Set the lower bound of the signal. When using random values, this will be the min random value. Default=0")
@@ -82,9 +84,9 @@ def main():
          if (not debugFile is None):
             debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
-         # If the data is between either the upper or lower range, then we want 
-         # to set data to the respective value in order to eliminate minor 
-         # deviations when the signal is either high or low. 
+         # If the data is between either the upper or lower range, and the data
+         # has been in the range for a certain number of iterations, then we want
+         # to alter the values in order to eliminate minor deviations
          if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
             inBoundIterations += 1
             if (inBoundIterations >= MAX_ITERATIONS):
