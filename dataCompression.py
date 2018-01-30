@@ -7,6 +7,8 @@ import sys
 def main():
    # Create the argument parser
    parser = argparse.ArgumentParser(description="Read values off of the SPI and compress the data")
+
+   # Add arguments to the parser
    parser.add_argument("--lowerBound", dest="lowerBound", nargs='?', 
       metavar="lowerBound", default=0, type=int, 
       help="Set the lower bound of the signal. When using random values, this will be the min random value. Default=0")
