@@ -20,6 +20,9 @@ def main():
       help="The offset from the upper/lower bound where data will be compressed. Default=20")
    parser.add_argument("--randValues", dest="randValues", action="store_true", 
       help="Use random values, insteads of reading off the SPI")
+   parser.add_argument("--rampSize", dest="rampSize", nargs='?', metvar="rampSize"
+      default=5, type=int, 
+      help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default=5")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
       metavar="debugOutput", type=argparse.FileType('w'), 
       help="Output files that contains the  original values of all data collected. Default='debugOupt'")
@@ -49,11 +52,12 @@ def main():
    # The signal needs to be within the upper/lower bound for a certain number
    # of iterations before changing values
    inBoundIterations = 0
-   MAX_ITERATIONS = 5
+   MAX_ITERATIONS = args.rampSize
 
    # If the data is in the threshold then buffer it
    thresholdBuffer = list()
    inThreshold = False
+   rampStart = 0 # How many values into the buffer the ramp starts
 
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
