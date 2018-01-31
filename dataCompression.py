@@ -20,7 +20,7 @@ def main():
       help="The offset from the upper/lower bound where data will be compressed. Default=20")
    parser.add_argument("--randValues", dest="randValues", action="store_true", 
       help="Use random values, insteads of reading off the SPI")
-   parser.add_argument("--rampSize", dest="rampSize", nargs='?', metvar="rampSize"
+   parser.add_argument("--rampSize", dest="rampSize", nargs='?', metavar="rampSize",
       default=5, type=int, 
       help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default=5")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
