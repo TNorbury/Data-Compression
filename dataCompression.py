@@ -18,11 +18,14 @@ def main():
    parser.add_argument("--boundOffset", dest="boundOffset", nargs='?',
       metavar="boundOffset", default=20, type=int,
       help="The offset from the upper/lower bound where data will be compressed. Default=20")
-   parser.add_argument("--randValues", dest="randValues", action="store_true", 
-      help="Use random values, insteads of reading off the SPI")
    parser.add_argument("--rampSize", dest="rampSize", nargs='?', metavar="rampSize",
       default=5, type=int, 
       help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default=5")
+   parser.add_argument("--maxRepeats", dest="maxRepeats", nargs='?', metavar="maxRepeats",
+      default=5000, type=int,
+      help="Control how many equal values in a row are compressed together at once. Default=5000")
+   parser.add_argument("--randValues", dest="randValues", action="store_true", 
+      help="Use random values, insteads of reading off the SPI")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
       metavar="debugOutput", type=argparse.FileType('w'), 
       help="Output files that contains the  original values of all data collected. Default='debugOupt'")
@@ -46,7 +49,6 @@ def main():
    
    oldData = 0
    oldDataTime = datetime.datetime.now()
-   repeatingValues = 0
 
    # The signal needs to be within the upper/lower bound for a certain number
    # of iterations before changing values
@@ -58,6 +60,10 @@ def main():
    inThreshold = False
    rampStart = 0 # How many values into the buffer the ramp starts
    bufferValuesRead = 0 # How many values have been read from the buffer
+
+   # Control how many equal values in a row are compressed together
+   repeatingValues = 0
+   maxRepeatingValues = 0
 
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
@@ -148,7 +154,8 @@ def main():
          # Otherwise, if the current data is equal to the last data, then we want
          # to write the previous data to the file and set the previous data to 
          # our current data
-         elif (data != oldData):
+         # Or if there have been too many repeating values, then also write to the file
+         elif (data != oldData or repeatingValues == maxRepeatingValues):
             # If this is the first data that's been read, then don't write 
             # anything to the file
             if (repeatingValues != 0):
