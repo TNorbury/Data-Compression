@@ -45,7 +45,7 @@ def main():
    # Open a file to write debug values to
    debugFile = args.debugOutput
 
-   useRand = args.randValues;
+   useRand = args.randValues
    
    oldData = 0
    oldDataTime = datetime.datetime.now()
@@ -63,7 +63,9 @@ def main():
 
    # Control how many equal values in a row are compressed together
    repeatingValues = 0
-   maxRepeatingValues = 0
+   maxRepeatingValues = args.maxRepeats
+
+   processData = True
 
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
@@ -91,81 +93,90 @@ def main():
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
             spiData = spi.xfer([0xFF])
-            data = spiData[0] * 4
+           
+            # If the data sent over was all 1s, then it's a control value, and 
+            # we don't want to process it
+            if (spiData == 0xFF):
+               processData = False
+            else:
+               processData = True
+               data = spiData[0] * 4
 
          dataTime = datetime.datetime.now()
+      
+      # if we didn't recieve a control word, then process the value as data
+      if (processData):
+         # If currently within the threshold, add the data to the buffer
+         if (inThreshold):
+            # Add data to the buffer
+            thresholdBuffer.append([data, dataTime])
 
-      # If currently within the threshold, add the data to the buffer
-      if (inThreshold):
-         # Add data to the buffer
-         thresholdBuffer.append([data, dataTime])
+            # Check to make sure that the data is still within the threshold
+            # If not, then we want to start clearing the buffer.
+            if (not (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)) 
+               or not (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset))):
+               inThreshold = False
 
-         # Check to make sure that the data is still within the threshold
-         # If not, then we want to start clearing the buffer.
-         if (not (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)) 
-            or not (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset))):
-            inThreshold = False
+               # Since the buffer is complete, we want to know when we should 
+               # stop altering the data (in order to preserve the ramp of signals
+               rampStart = len(thresholdBuffer) - rampSize
 
-            # Since the buffer is complete, we want to know when we should 
-            # stop altering the data (in order to preserve the ramp of signals
-            rampStart = len(thresholdBuffer) - rampSize
+               # We also need to indicate that we haven't read any values off the buffer
+               bufferValuesRead = 0
 
-            # We also need to indicate that we haven't read any values off the buffer
-            bufferValuesRead = 0
+               # If the ramp start is less then 0, then set it to 0
+               if (rampStart < 0):
+                  rampStart = 0
 
-            # If the ramp start is less then 0, then set it to 0
-            if (rampStart < 0):
-               rampStart = 0
-
-      # Otherwise, process the data
-      else:
-         # If a debug file is being used write the data and time to it
-         if (not debugFile is None):
-            debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
-
-         # If the data is between either the upper or lower range, then we want 
-         # to set data to the respective value in order to eliminate minor 
-         # deviations when the signal is either high or low. 
-         if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
-            inThreshold = True
-            inBoundIterations += 1
-
-            # If the data isn't in the beginning or ending ramp, then change the value
-            if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
-               data = lowerBound
-
-         elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
-            inThreshold = True
-            inBoundIterations += 1
-
-            # If the data isn't in the beginning or ending ramp, then change the value
-            if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
-               data = upperBound
-
+         # Otherwise, process the data
          else:
-            inThreshold = False
-            inBoundIterations = 0
+            # If a debug file is being used write the data and time to it
+            if (not debugFile is None):
+               debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
-         # If the current data is equal the previously acquired data, then we want
-         # to increase the counter of repeating values
-         if (data == oldData):
-            repeatingValues += 1
+            # If the data is between either the upper or lower range, then we want 
+            # to set data to the respective value in order to eliminate minor 
+            # deviations when the signal is either high or low. 
+            if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
+               inThreshold = True
+               inBoundIterations += 1
 
-         # Otherwise, if the current data is equal to the last data, then we want
-         # to write the previous data to the file and set the previous data to 
-         # our current data
-         # Or if there have been too many repeating values, then also write to the file
-         elif (data != oldData or repeatingValues == maxRepeatingValues):
-            # If this is the first data that's been read, then don't write 
-            # anything to the file
-            if (repeatingValues != 0):
-               dataFile.write(str(repeatingValues) + " " + str(oldData) + " " 
-               + oldDataTime.strftime("%I:%M:%S.%f") + "\n")
+               # If the data isn't in the beginning or ending ramp, then change the value
+               if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
+                  data = lowerBound
 
-            # Reset the number of repeating values, and set the current data as the old data
-            repeatingValues = 1
-            oldData = data
-            oldDataTime = dataTime
+            elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
+               inThreshold = True
+               inBoundIterations += 1
+
+               # If the data isn't in the beginning or ending ramp, then change the value
+               if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
+                  data = upperBound
+
+            else:
+               inThreshold = False
+               inBoundIterations = 0
+
+            # If the current data is equal the previously acquired data, then we want
+            # to increase the counter of repeating values
+            if (data == oldData and repeatingValues < maxRepeatingValues):
+               repeatingValues += 1
+
+            # Otherwise, if the current data is equal to the last data, then we want
+            # to write the previous data to the file and set the previous data to 
+            # our current data
+            # Or if there have been too many repeating values, then also write to the file
+            else:
+               # If this is the first data that's been read, then don't write 
+               # anything to the file
+               if (repeatingValues != 0):
+                  dataFile.write(str(repeatingValues) + " " + str(oldData) + " " 
+                  + oldDataTime.strftime("%I:%M:%S.%f") + "\n")
+
+               # Reset the number of repeating values, and set the current data as the old data
+               repeatingValues = 1
+               oldData = data
+               oldDataTime = dataTime
 
 
 if __name__ == "__main__":
