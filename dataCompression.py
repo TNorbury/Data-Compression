@@ -110,7 +110,7 @@ def main():
            
             # If the data sent over was all 1s, then it's a control value, and 
             # we don't want to process it
-            if (spiData == 0xFF):
+            if (spiData[0] == 0xFF):
                processData = False
             else:
                processData = True
@@ -156,7 +156,7 @@ def main():
                inBoundIterations += 1
 
                # If the data isn't in the beginning or ending ramp, then change the value
-               if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
+               if (inBoundIterations >= rampSize and bufferValuesRead <= rampStart):
                   data = lowerBound
 
             elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
@@ -164,7 +164,7 @@ def main():
                inBoundIterations += 1
 
                # If the data isn't in the beginning or ending ramp, then change the value
-               if (inBoundIterations >= rampSize and bufferValuesRead < rampStart):
+               if (inBoundIterations >= rampSize and bufferValuesRead <= rampStart):
                   data = upperBound
 
             else:
