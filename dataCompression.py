@@ -2,7 +2,21 @@ import argparse
 import datetime
 import math
 import random
+import signal
 import sys
+
+class KillHandler:
+   isKilled = False
+
+   def __init__(self):
+      signal.signal(signal.SIGINT, self.handleKill)
+      signal.signal(signal.SIGTERM, self.handleKill)
+
+   def handleKill(self, signum, frame):
+      # Tell the program that it has been killed, so that it can exit 
+      # gracefully when it gets a chance
+      isKilled = True
+
 
 def main():
    # Create the argument parser
