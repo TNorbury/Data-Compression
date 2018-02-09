@@ -5,20 +5,27 @@ import random
 import signal
 import sys
 
+# The class will handle incoming interupt and termination signals so that the
+# program can exit "gracefully"
 class KillHandler:
-   isKilled = False
-
    def __init__(self):
       signal.signal(signal.SIGINT, self.handleKill)
       signal.signal(signal.SIGTERM, self.handleKill)
+      self.killed = False
 
    def handleKill(self, signum, frame):
       # Tell the program that it has been killed, so that it can exit 
       # gracefully when it gets a chance
-      isKilled = True
+      self.killed = True
+
+   def isKilled(self):
+      return self.killed
 
 
 def main():
+   # Initialize the signal handler 
+   killHandler = KillHandler()
+
    # Create the argument parser
    parser = argparse.ArgumentParser(description="Read values off of the SPI and compress the data")
 
@@ -90,8 +97,8 @@ def main():
    elif (useRand):
       useRand = True
 
-   # Indefinetely read data from SPI
-   while (True):
+   # Run until the program receives a signal to stop 
+   while (not killHandler.isKilled()):
       # If outside of the threshold, and there are still values left in the threshold
       # then get data from the buffer, and not the normal way
       if (not inThreshold and len(thresholdBuffer) != 0):
@@ -118,7 +125,7 @@ def main():
 
          dataTime = datetime.datetime.now()
       
-      # if we didn't recieve a control word, then process the value as data
+      # if we didn't receive a control word, then process the value as data
       if (processData):
          # If currently within the threshold, add the data to the buffer
          if (inThreshold):
