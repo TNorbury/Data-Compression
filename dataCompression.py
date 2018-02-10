@@ -199,6 +199,20 @@ def main():
                oldData = data
                oldDataTime = dataTime
 
+   # Since the program has been killed, write whatever data is in the buffer to the file, and then close the file
+   # Go through the threshold buffer until it's empty
+   while(len(thresholdBuffer) > 0):
+      # Get data from the buffer
+      bufferData = thresholdBuffer.pop()
+      data = bufferData[0]
+      dataTime = bufferData[1]
+
+      # Write the data to the debug file, if it exists
+      if (not debugFile is None):
+         debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+
+      # Write the data to the data file
+      dataFile.write("1 " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
 if __name__ == "__main__":
    main()
