@@ -49,7 +49,7 @@ def main():
       help="Use random values, insteads of reading off the SPI")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
       metavar="debugOutput", type=argparse.FileType('w'), 
-      help="Output files that contains the  original values of all data collected. Default='debugOupt'")
+      help="Output files that contains the  original values of all data collected. Default='debugOutput'")
    parser.add_argument("--outputFile", dest="outputFile", nargs='?',
       metavar="outputFile", default="data", type=argparse.FileType('w'),
       help="File where collected data will be written to. Default='data'")
