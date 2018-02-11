@@ -214,6 +214,13 @@ def main():
       # Write the data to the data file
       dataFile.write("1 " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
+   # Finally, close the file
+   dataFile.close()
+
+   # Also close the debug file, if it exists
+   if (not debugFile is None):
+      debugFile.close()
+
 if __name__ == "__main__":
    main()
 
