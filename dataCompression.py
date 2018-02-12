@@ -49,7 +49,7 @@ def main():
       help="Use random values, insteads of reading off the SPI")
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
       metavar="debugOutput", type=argparse.FileType('w'), 
-      help="Output files that contains the  original values of all data collected. Default='debugOupt'")
+      help="Output files that contains the  original values of all data collected. Default='debugOutput'")
    parser.add_argument("--outputFile", dest="outputFile", nargs='?',
       metavar="outputFile", default="data", type=argparse.FileType('w'),
       help="File where collected data will be written to. Default='data'")
@@ -200,6 +200,27 @@ def main():
                oldData = data
                oldDataTime = dataTime
 
+   # Since the program has been killed, write whatever data is in the buffer to the file, and then close the file
+   # Go through the threshold buffer until it's empty
+   while(len(thresholdBuffer) > 0):
+      # Get data from the buffer
+      bufferData = thresholdBuffer.pop()
+      data = bufferData[0]
+      dataTime = bufferData[1]
+
+      # Write the data to the debug file, if it exists
+      if (not debugFile is None):
+         debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+
+      # Write the data to the data file
+      dataFile.write("1 " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+
+   # Finally, close the file
+   dataFile.close()
+
+   # Also close the debug file, if it exists
+   if (not debugFile is None):
+      debugFile.close()
 
 if __name__ == "__main__":
    main()
