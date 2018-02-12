@@ -94,6 +94,7 @@ def main():
       useRand = False
       spi = spidev.SpiDev()
       spi.open(0,0)
+      spi.max_speed_hz = 125000000
    elif (useRand):
       useRand = True
 
@@ -114,7 +115,7 @@ def main():
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
             spiData = spi.xfer([0xFF])
-           
+
             # If the data sent over was all 1s, then it's a control value, and 
             # we don't want to process it
             if (spiData[0] == 0xFF):
