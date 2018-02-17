@@ -29,24 +29,48 @@ def main():
    # Create the argument parser
    parser = argparse.ArgumentParser(description="Read values off of the SPI and compress the data")
 
+   # The following parameters alter how much data gets compressed
    # Add arguments to the parser
+   # Minimum ADC value is 0
+   minADCValue = 0
    parser.add_argument("--lowerBound", dest="lowerBound", nargs='?', 
-      metavar="lowerBound", default=0, type=int, 
-      help="Set the lower bound of the signal. When using random values, this will be the min random value. Default=0")
+      metavar="lowerBound", default=minADCValue, type=int, 
+      help="Set the lower bound of the signal. When using random values, this will be the min random value. Default="+str(minADCValue))
+
+   # Max 10 bit ADC value is 1024
+   maxADCValue = 1024
    parser.add_argument("--upperBound", dest="upperBound", nargs='?',
-      metavar="upperBound", default=1024, type=int, 
-      help="Set the upper bound of the signal. When using random values, this will be the max random value. Default=1024")
+      metavar="upperBound", default=maxADCValue, type=int, 
+      help="Set the upper bound of the signal. When using random values, this will be the max random value. Default="+str(maxADCValue))
+
+   # The default threshold range (aka bound offset) of values that make up the 
+   # upper/lower thresholds. The value 20 is arbitrary
+   defaultThresholdRange = 20
    parser.add_argument("--boundOffset", dest="boundOffset", nargs='?',
-      metavar="boundOffset", default=20, type=int,
-      help="The offset from the upper/lower bound where data will be compressed. Default=20")
+      metavar="boundOffset", default=defaultThresholdRange, type=int,
+      help="The offset from the upper/lower bound that defines the range of values that will have their values altered to the upper/lower range, respectively. Default="+str(defaultThresholdRange))
+
+   # The default size (i.e. number of values) of ramps entering/exiting the 
+   # thresholds that won't be changed to the upper/lower bound. 
+   # The value of 5 is arbitrary.
+   defaultRampSize = 5
    parser.add_argument("--rampSize", dest="rampSize", nargs='?', metavar="rampSize",
-      default=5, type=int, 
-      help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default=5")
+      default=defaultRampSize, type=int, 
+      help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default="+str(defaultRampSize))
+
+   # This is the default number of values that will be compressed at once.
+   # The value of 5000 is arbitrary
+   defaultCompressionSize = 5000
    parser.add_argument("--maxRepeats", dest="maxRepeats", nargs='?', metavar="maxRepeats",
       default=5000, type=int,
       help="Control how many equal values in a row are compressed together at once. Default=5000")
+   
+   # This argument allows random values to be used instead of SPI
    parser.add_argument("--randValues", dest="randValues", action="store_true", 
       help="Use random values, insteads of reading off the SPI")
+
+   # The following two arguments determine where data will be written to, 
+   # and whether or not a debug file is used
    parser.add_argument("--debugOutput", dest="debugOutput", nargs='?',
       metavar="debugOutput", type=argparse.FileType('w'), 
       help="Output files that contains the  original values of all data collected. Default='debugOutput'")
@@ -114,7 +138,8 @@ def main():
 
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
-            spiData = spi.xfer([0xFF])
+            # The use of 0 here is arbitrary 
+            spiData = spi.xfer([0x0])
 
             # If the data sent over was all 1s, then it's a control value, and 
             # we don't want to process it
@@ -122,6 +147,8 @@ def main():
                processData = False
             else:
                processData = True
+
+               # The value is multiplied by 4 in order to scale it back up
                data = spiData[0] * 4
 
          dataTime = datetime.datetime.now()
