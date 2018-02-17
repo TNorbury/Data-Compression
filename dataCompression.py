@@ -118,6 +118,24 @@ def main():
       useRand = False
       spi = spidev.SpiDev()
       spi.open(0,0)
+
+      # The following is a list of values accepted for the max_speed_hz parameter
+      # Credit goes to http://www.takaitra.com/posts/492 for defining these values
+      # 125.0 MHz       125000000
+      # 62.5 MHz        62500000
+      # 31.2 MHz        31200000
+      # 15.6 MHz        15600000
+      # 7.8 MHz         7800000
+      # 3.9 MHz         3900000
+      # 1953 kHz        1953000
+      # 976 kHz         976000
+      # 488 kHz         488000
+      # 244 kHz         244000
+      # 122 kHz         122000
+      # 61 kHz          61000
+      # 30.5 kHz        30500
+      # 15.2 kHz        15200
+      # 7629 Hz         7629
       spi.max_speed_hz = 125000000
    elif (useRand):
       useRand = True
@@ -206,8 +224,9 @@ def main():
                inThreshold = False
                inBoundIterations = 0
 
-            # If the current data is equal the previously acquired data, then we want
-            # to increase the counter of repeating values
+            # If the current data is equal the previously acquired data, and 
+            # the max number of repeating values hasn't been reach then we 
+            # want to increase the counter of repeating values
             if (data == oldData and repeatingValues < maxRepeatingValues):
                repeatingValues += 1
 
@@ -227,7 +246,8 @@ def main():
                oldData = data
                oldDataTime = dataTime
 
-   # Since the program has been killed, write whatever data is in the buffer to the file, and then close the file
+   # Since the program has been killed, write whatever data is in the buffer 
+   # to the file, and then close the file.
    # Go through the threshold buffer until it's empty
    while(len(thresholdBuffer) > 0):
       # Get data from the buffer
