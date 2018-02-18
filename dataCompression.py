@@ -136,7 +136,7 @@ def main():
       # 30.5 kHz        30500
       # 15.2 kHz        15200
       # 7629 Hz         7629
-      spi.max_speed_hz = 125000000
+      spi.max_speed_hz = 488000
    elif (useRand):
       useRand = True
 
