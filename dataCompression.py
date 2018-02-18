@@ -157,17 +157,20 @@ def main():
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
             # The use of 0 here is arbitrary 
-            spiData = spi.xfer([0x0])
+            spiData = spi.xfer([0x0, 0x0])
 
-            # If the data sent over was all 1s, then it's a control value, and 
+            # Take the two bytes and combine it into one byte
+            data = (spiData[1] << 8) | spiData[0]
+
+            # If the data sent over was all 1s (with a 12-bit ADC), then it's a control value, and 
             # we don't want to process it
-            if (spiData[0] == 0xFF):
+            if (spiData[0] == 0xFFF):
                processData = False
             else:
                processData = True
 
                # The value is multiplied by 4 in order to scale it back up
-               data = spiData[0] * 4
+               #data = spiData[0] * 4
 
          dataTime = datetime.datetime.now()
       
