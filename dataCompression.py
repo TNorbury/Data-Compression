@@ -5,6 +5,9 @@ import random
 import signal
 import sys
 
+# This is the max value (all 1s in binary) that can come over the SPI
+MAX_ADC_VALUE = 0xFFF
+
 # The class will handle incoming interupt and termination signals so that the
 # program can exit "gracefully"
 class KillHandler:
@@ -112,6 +115,12 @@ def main():
 
    processData = True
 
+   # These represent the indicies used to indicate the high and low byte of the
+   # data that is sent over SPI
+   lowByte = 0
+   highByte = 1
+   spiData = [0, 0]
+
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
       import spidev
@@ -160,11 +169,22 @@ def main():
             spiData = spi.xfer([0x0, 0x0])
 
             # Take the two bytes and combine it into one byte
-            data = (spiData[1] << 8) | spiData[0]
+            data = (spiData[highByte] << 8) | spiData[lowByte]
+
+            # If the value we got over SPI is greater than the max value, then 
+            # that means our high and low bytes got switched around
+            if (data > MAX_ADC_VALUE):
+               swap = highByte
+               highByte = lowByte
+               lowByte = highByte
+
+               # Recalculate the data with the new high/low byte indicies
+               data = (spiData[highByte] << 8) | spiData[lowByte]
+               
 
             # If the data sent over was all 1s (with a 12-bit ADC), then it's a control value, and 
             # we don't want to process it
-            if (spiData[0] == 0xFFF):
+            if (data == MAX_ADC_VALUE):
                processData = False
             else:
                processData = True
