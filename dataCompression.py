@@ -204,7 +204,7 @@ def main():
             # Check to make sure that the data is still within the threshold
             # If not, then we want to start clearing the buffer.
             if (not (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)) 
-               or not (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset))):
+               and not (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset))):
                inThreshold = False
 
                # Since the buffer is complete, we want to know when we should 
@@ -228,16 +228,24 @@ def main():
             # to set data to the respective value in order to eliminate minor 
             # deviations when the signal is either high or low. 
             if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
-               inThreshold = True
-               inBoundIterations += 1
+               # If there isn't any data in the buffer, then that means this 
+               # value is straight off of the SPI
+               if (len(thresholdBuffer) == 0):
+                  inThreshold = True
+               else:
+                  inBoundIterations += 1
 
                # If the data isn't in the beginning or ending ramp, then change the value
                if (inBoundIterations >= rampSize and bufferValuesRead <= rampStart):
                   data = lowerBound
 
             elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
-               inThreshold = True
-               inBoundIterations += 1
+               # If there isn't any data in the buffer, then that means this 
+               # value is straight off of the SPI
+               if (len(thresholdBuffer) == 0):
+                  inThreshold = True
+               else:
+                  inBoundIterations += 1
 
                # If the data isn't in the beginning or ending ramp, then change the value
                if (inBoundIterations >= rampSize and bufferValuesRead <= rampStart):
