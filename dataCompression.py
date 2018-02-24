@@ -121,6 +121,14 @@ def main():
    highByte = 1
    spiData = [0, 0]
 
+   firstValue = True # Indicates if we're reading the first value or not
+
+   # These are the flags that will be set if a control word is sent over
+   flags = 0
+   
+   # Definitions of the different flags
+   # 0000 = No Data
+
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
       import spidev
@@ -171,9 +179,10 @@ def main():
             # Take the two bytes and combine it into one byte
             data = (spiData[highByte] << 8) | spiData[lowByte]
 
-            # If the value we got over SPI is greater than the max value, then 
-            # that means our high and low bytes got switched around
-            if (data > MAX_ADC_VALUE):
+            # If the value we got over SPI is greater than the max value, and 
+            # it's the first value being read then that means our high and low 
+            # bytes got switched around and we need to adjust accordingly 
+            if (data > MAX_ADC_VALUE and firstValue):
                swap = highByte
                highByte = lowByte
                lowByte = highByte
@@ -184,10 +193,17 @@ def main():
 
             # If the data sent over was all 1s (with a 12-bit ADC), then it's a control value, and 
             # we don't want to process it
-            if (data == MAX_ADC_VALUE):
+            if ((data & MAX_ADC_VALUE) == MAX_ADC_VALUE):
                processData = False
+               
+               # Right shift the data 12-bits to get the flags 
+               flags = data >> 12
+
             else:
                processData = True
+
+               # Indicate that we're no longer on the first value
+               firstValue = False
 
                # The value is multiplied by 4 in order to scale it back up
                #data = spiData[0] * 4
