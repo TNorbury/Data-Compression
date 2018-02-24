@@ -176,7 +176,7 @@ def main():
             # The use of 0 here is arbitrary 
             spiData = spi.xfer([0x0, 0x0])
 
-            # Take the two bytes and combine it into one byte
+            # Take the two separate bytes and combine it into one value
             data = (spiData[highByte] << 8) | spiData[lowByte]
 
             # If the value we got over SPI is greater than the max value, and 
@@ -204,9 +204,6 @@ def main():
 
                # Indicate that we're no longer on the first value
                firstValue = False
-
-               # The value is multiplied by 4 in order to scale it back up
-               #data = spiData[0] * 4
 
          dataTime = datetime.datetime.now()
       
