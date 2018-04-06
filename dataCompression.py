@@ -122,7 +122,7 @@ def main():
    highByte = 1
    spiData = [0, 0]
 
-   firstValue = True # Indicates if we're reading the first value or not
+   #firstValue = True # Indicates if we're reading the first value or not
 
    # These are the flags that will be set if a control word is sent over
    flags = 0
@@ -180,31 +180,11 @@ def main():
             # Take the two separate bytes and combine it into one value
             data = (spiData[highByte] << 8) | spiData[lowByte]
 
-            # If the value we got over SPI is greater than the max value, and 
-            # it's the first value being read then that means our high and low 
-            # bytes got switched around and we need to adjust accordingly 
-            if (data > MAX_ADC_VALUE and firstValue):
-               swap = highByte
-               highByte = lowByte
-               lowByte = highByte
-
-               # Recalculate the data with the new high/low byte indicies
-               data = (spiData[highByte] << 8) | spiData[lowByte]
-               
-
-            # If the data sent over was all 1s (with a 12-bit ADC), then it's a control value, and 
-            # we don't want to process it
-            if ((data & MAX_ADC_VALUE) == MAX_ADC_VALUE):
+            # If the data is equal to 0, then we ignore it
+            if (data == 0):
                processData = False
-               
-               # Right shift the data 12-bits to get the flags 
-               flags = data >> 12
-
             else:
                processData = True
-
-               # Indicate that we're no longer on the first value
-               firstValue = False
 
          dataTime = datetime.datetime.now()
       
