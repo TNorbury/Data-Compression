@@ -57,7 +57,7 @@ def main():
    # thresholds that won't be changed to the upper/lower bound. 
    # The value of 5 is arbitrary.
    defaultRampSize = 5
-   parser.add_argument("--rampSize", dest="rampSize", nargs='?', metavar="rampSize",
+   parser.add_argument("--rampPct", dest="rampPct", nargs='?', metavar="rampPct",
       default=defaultRampSize, type=int, 
       help="Set the size of the ramp, which will control how many of the values in a threshold are preservered when entering/exiting the threshold. Default="+str(defaultRampSize))
 
@@ -101,7 +101,8 @@ def main():
    # The signal needs to be within the upper/lower bound for a certain number
    # of iterations before changing values
    inBoundIterations = 0
-   rampSize = args.rampSize
+   rampPct = float(args.rampPct) / 100
+   rampSize = 0
 
    # If the data is in the threshold then buffer it
    thresholdBuffer = list()
@@ -219,6 +220,9 @@ def main():
             if (not (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)) 
                and not (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset))):
                inThreshold = False
+
+               # Calculate the size of the ramp based on the size of the buffer and the % of the buffer we want to preserve
+               rampSize = (len(thresholdBuffer) * rampPct) // 1
 
                # Since the buffer is complete, we want to know when we should 
                # stop altering the data (in order to preserve the ramp of signals
