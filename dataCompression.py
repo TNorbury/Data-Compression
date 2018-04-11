@@ -5,9 +5,6 @@ import random
 import signal
 import sys
 
-# This is the max value (all 1s in binary) that can come over the SPI
-MAX_ADC_VALUE = 0xFFF
-
 # The class will handle incoming interupt and termination signals so that the
 # program can exit "gracefully"
 class KillHandler:
