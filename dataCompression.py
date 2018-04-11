@@ -119,14 +119,6 @@ def main():
    highByte = 1
    spiData = [0, 0]
 
-   #firstValue = True # Indicates if we're reading the first value or not
-
-   # These are the flags that will be set if a control word is sent over
-   flags = 0
-   
-   # Definitions of the different flags
-   # 0000 = No Data
-
    # If the SPI argument was given, or no argument at all, then get data off of the SPI.
    if (not useRand):
       import spidev
