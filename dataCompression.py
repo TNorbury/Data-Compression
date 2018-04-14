@@ -252,11 +252,19 @@ def main():
             # our current data
             # Or if there have been too many repeating values, then also write to the file
             else:
-               # If this is the first data that's been read, then don't write 
-               # anything to the file
-               if (repeatingValues != 0):
+               # If there is more than one value in a row, then we want to indicate that 
+               if (repeatingValues > 1):
+                  # Firstly, write something that indicates that the following line contains repeating values 
+                  dataFile.write("-R-\n")
+                  
+                  # Next, write the number of times the value repeats, the 
+                  # value itself, and the time the first of the repeating values was encountered
                   dataFile.write(str(repeatingValues) + " " + str(oldData) + " " 
                   + oldDataTime.strftime("%I:%M:%S.%f") + "\n")
+
+               # Otherwise, if this is just a value by itself, then just print that value
+               elif (repeatingValues == 1):
+                  dataFile.write(str(oldData) + "\n")
 
                # Reset the number of repeating values, and set the current data as the old data
                repeatingValues = 1
