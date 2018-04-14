@@ -134,7 +134,7 @@ def main():
       # 15.6 MHz        15600000
       # 7.8 MHz         7800000
       # 3.9 MHz         3900000
-      # 1953 kHz        1953000
+      # 1953 kHz        1953000 <-- Works best
       # 976 kHz         976000
       # 488 kHz         488000
       # 244 kHz         244000
@@ -164,7 +164,8 @@ def main():
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
             # The use of 0 here is arbitrary 
-            spiData = spi.xfer([0x0, 0x0])
+            spiData[highByte] = spi.xfer([0x0])[0]
+            spiData[lowByte] = spi.xfer([0x0])[0]
 
 
             # Take the two separate bytes and combine it into one value
