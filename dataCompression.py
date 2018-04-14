@@ -5,6 +5,10 @@ import random
 import signal
 import sys
 
+# We're also using spidev, but it's not imported until later.
+# Documentation on that package can be found at github.com/doceme/py-spidev
+# Some good examples of how to use it can be found in this code and also at http://www.takaitra.com/posts/492
+
 # The class will handle incoming interupt and termination signals so that the
 # program can exit "gracefully"
 class KillHandler:
