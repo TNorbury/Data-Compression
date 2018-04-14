@@ -143,7 +143,7 @@ def main():
       # 30.5 kHz        30500
       # 15.2 kHz        15200
       # 7629 Hz         7629
-      spi.max_speed_hz = 15600000
+      spi.max_speed_hz = 1953000
    elif (useRand):
       useRand = True
 
@@ -166,18 +166,22 @@ def main():
             # The use of 0 here is arbitrary 
             spiData = spi.xfer([0x0, 0x0])
 
+
             # Take the two separate bytes and combine it into one value
             data = (spiData[highByte] << 8) | spiData[lowByte]
 
-            # If the data is equal to 0, then we ignore it
+            # If the data is equal to 0, that means that the slave doesn't have
+            # any data to send over. So we'll ignore this data and sleep for a
+            # little bit
             if (data == 0):
                processData = False
+               time.sleep(1)
             else:
                processData = True
 
          dataTime = datetime.datetime.now()
       
-      # if we didn't receive a control word, then process the value as data
+      # If the data is good (i.e. not 0), then we'll process it
       if (processData):
          # If currently within the threshold, add the data to the buffer
          if (inThreshold):
