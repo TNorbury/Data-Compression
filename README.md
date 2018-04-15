@@ -43,20 +43,24 @@ optional arguments:
   
 ## Compressed Data Format
 The data that is written to the compressed file is in the following format:  
-> r d t
+> r d t (where r & t are only used when there are repeating values)
 >
 > Where:  
 > r = # of following data points that have the following value subsequently  
 > d = value of the data point  
-> t = the time (formatted as hour:minute:second.fractionOfSecond) that the first data point in the "collection" of equal values was read  
+> t = the time (formatted as hour:minute:second.fractionOfSecond) that the first data point in the "collection" of equal values was read
+> 
+> A line of repeating values will always be preceded by "-R-"
   
 For example, the following lines in the compressed data:
-> 2 48 1:56:10.0000  
+> 48  
+> 50  
+> -R-  
 > 3 249 1:56:10.0020  
-> 1 40 1:56:10.0050  
+> 40  
   
 Would represent the following stream of data:  
-> 48 48 249 249 249 40  
+> 48 50 249 249 249 40  
   
 ---  
   
