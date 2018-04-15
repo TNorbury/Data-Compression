@@ -280,28 +280,36 @@ def main():
                oldData = data
                oldDataTime = dataTime
 
+
    # Since the program has been killed, write whatever data is in the buffer 
    # to the file, and then close the file.
-   # Go through the threshold buffer until it's empty
-   while(len(thresholdBuffer) > 0):
-      # Get data from the buffer
-      bufferData = thresholdBuffer.pop()
-      data = bufferData[0]
-      dataTime = bufferData[1]
+   bufferData = thresholdBuffer.pop()
+   data = bufferData[0]
+   dataTime = bufferData[1]
+   
+   # Determine if the value is in the upper or lower bound
+   if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
+      data = lowerBound
+   elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
+      data = upperBound
 
-      # Write the data to the debug file, if it exists
-      if (not debugFile is None):
+   
+   dataFile.write("-R-\n")
+   dataFile.write(str(len(thresholdBuffer) + 1) + " " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+
+   # If there is a debug file, write all the data to it
+   if (not debugFile is None):
+      while(len(thresholdBuffer) > 0):
+         bufferData = thresholdBuffer.pop()
+         data = bufferData[0]
+         dataTime = bufferData[1]
          debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+      debugFile.close()
 
-      # Write the data to the data file
-      dataFile.write("1 " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
    # Finally, close the file
    dataFile.close()
 
-   # Also close the debug file, if it exists
-   if (not debugFile is None):
-      debugFile.close()
 
 if __name__ == "__main__":
    main()

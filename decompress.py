@@ -13,6 +13,7 @@ def main():
 
    # Iterate over each line in the file
    for line in compressedFile:
+      line = line.replace("\n", "")
 
       # If the line is "-R-" that means that the next line in the file is 
       # repeating values
@@ -22,11 +23,12 @@ def main():
       # Otherwise, if the line doesn't contain repeating values, then just 
       # print the value
       elif (not repeatingValues):
-         decompressedFile.write(data + "\n")
+         decompressedFile.write(line + "\n")
 
       # Otherwise, if the line does contain repeating values, then we want to
       # print out the value the number of times it repeats
       elif (repeatingValues):
+
 
          # Split the line into three parts: number of repeating values, the data,
          # and the time the data was read
@@ -44,6 +46,8 @@ def main():
          # Now, for the remaining repeated values, just write the value by itself
          for i in range(1, numValues):
             decompressedFile.write(data + "\n")
+
+         repeatingValues = False
 
    compressedFile.close()
    decompressedFile.close()
