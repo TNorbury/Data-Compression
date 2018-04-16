@@ -171,8 +171,15 @@ def main():
          else:
             # Read a byte from SPI and multiply it by 4 to get the full value
             # The use of 0 here is arbitrary 
-            spiData[highByte] = spi.xfer([0x0])[0]
             spiData[lowByte] = spi.xfer([0x0])[0]
+            spiData[highByte] = spi.xfer([0x0])[0]
+
+            # If the value is greater than the max 12-bit value, then the high 
+            # byte and low byte need to be swapped
+            if (spiData[highByte] > 0xF or spiData[highByte] == 0):
+               swap = spiData[highByte]
+               spiData[highByte] = spiData[lowByte]
+               spiData[lowByte] = swap
 
 
             # Take the two separate bytes and combine it into one value
@@ -183,7 +190,7 @@ def main():
             # little bit
             if (data == 0):
                processData = False
-               time.sleep(1)
+               time.sleep(.1)
             else:
                processData = True
 
