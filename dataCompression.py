@@ -293,32 +293,34 @@ def main():
 
    # Since the program has been killed, write whatever data is in the buffer 
    # to the file, and then close the file.
-   bufferData = thresholdBuffer.pop()
-   data = bufferData[0]
-   dataTime = bufferData[1]
-   
-   # Determine if the value is in the upper or lower bound
-   if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
-      data = lowerBound
-   elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
-      data = upperBound
+   if (len(thresholdBuffer) > 0):
+      bufferData = thresholdBuffer.pop()
+      data = bufferData[0]
+      dataTime = bufferData[1]
+      
+      # Determine if the value is in the upper or lower bound
+      if (data >= (lowerBound - boundOffset) and data <= (lowerBound + boundOffset)):
+         data = lowerBound
+      elif (data >= (upperBound - boundOffset) and data <= (upperBound + boundOffset)):
+         data = upperBound
 
-   
-   dataFile.write("-R-\n")
-   dataFile.write(str(len(thresholdBuffer) + 1) + " " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+      
+      dataFile.write("-R-\n")
+      dataFile.write(str(len(thresholdBuffer) + 1) + " " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
-   # If there is a debug file, write all the data to it
-   if (not debugFile is None):
-      while(len(thresholdBuffer) > 0):
-         bufferData = thresholdBuffer.pop()
-         data = bufferData[0]
-         dataTime = bufferData[1]
-         debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
-      debugFile.close()
+      # If there is a debug file, write all the data to it
+      if (not debugFile is None):
+         while(len(thresholdBuffer) > 0):
+            bufferData = thresholdBuffer.pop()
+            data = bufferData[0]
+            dataTime = bufferData[1]
+            debugFile.write(str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
+         debugFile.close()
 
 
    # Finally, close the file
    dataFile.close()
+   spi.close()
 
 
 if __name__ == "__main__":
