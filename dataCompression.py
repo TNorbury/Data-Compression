@@ -4,6 +4,7 @@ import math
 import random
 import signal
 import sys
+import time
 
 # We're also using spidev, but it's not imported until later.
 # Documentation on that package can be found at github.com/doceme/py-spidev
@@ -117,8 +118,10 @@ def main():
 
    processData = True
 
+
    # These represent the indicies used to indicate the high and low byte of the
    # data that is sent over SPI
+   MAX_ADC = 0xFFF
    lowByte = 0
    highByte = 1
    spiData = [0, 0]
@@ -147,7 +150,7 @@ def main():
       # 30.5 kHz        30500
       # 15.2 kHz        15200
       # 7629 Hz         7629
-      spi.max_speed_hz = 1953000
+      spi.max_speed_hz = 31200000
    elif (useRand):
       useRand = True
 
