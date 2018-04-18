@@ -172,7 +172,12 @@ def main():
             # Read a byte from SPI and multiply it by 4 to get the full value
             # The use of 0 here is arbitrary 
             spiData[lowByte] = spi.xfer([0x0])[0]
+            while (spiData[lowByte] == 0):
+               spiData[lowByte] = spi.xfer([0x0])[0]
+
             spiData[highByte] = spi.xfer([0x0])[0]
+            while(spiData[highByte] == 0):
+               spiData[highByte] = spi.xfer([0x0])[0]
 
             # If the value is greater than the max 12-bit value, then the high 
             # byte and low byte need to be swapped
