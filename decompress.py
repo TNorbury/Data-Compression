@@ -15,9 +15,9 @@ def main():
    for line in compressedFile:
       line = line.replace("\n", "")
 
-      # If the line is "-R-" that means that the next line in the file is 
+      # If the line is "-" that means that the next line in the file is 
       # repeating values
-      if (line == "-R-"):
+      if (line == "-"):
          repeatingValues = True
       
       # Otherwise, if the line doesn't contain repeating values, then just 

@@ -279,7 +279,7 @@ def main():
                # If there is more than one value in a row, then we want to indicate that 
                if (repeatingValues > 1):
                   # Firstly, write something that indicates that the following line contains repeating values 
-                  dataFile.write("-R-\n")
+                  dataFile.write("-\n")
                   
                   # Next, write the number of times the value repeats, the 
                   # value itself, and the time the first of the repeating values was encountered
@@ -310,7 +310,7 @@ def main():
          data = upperBound
 
       
-      dataFile.write("-R-\n")
+      dataFile.write("-\n")
       dataFile.write(str(len(thresholdBuffer) + 1) + " " + str(data) + " " + dataTime.strftime("%I:%M:%S.%f") + "\n")
 
       # If there is a debug file, write all the data to it
