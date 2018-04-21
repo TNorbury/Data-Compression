@@ -169,8 +169,7 @@ def main():
             data = random.randint(lowerBound, upperBound + 1)
 
          else:
-            # Read a byte from SPI and multiply it by 4 to get the full value
-            # The use of 0 here is arbitrary 
+            # Read a byte from SPI 
             spiData[lowByte] = spi.xfer([0x0])[0]
             while (spiData[lowByte] == 0):
                spiData[lowByte] = spi.xfer([0x0])[0]
