@@ -162,7 +162,7 @@ def main():
       # 15.6 MHz        15600000
       # 7.8 MHz         7800000
       # 3.9 MHz         3900000
-      # 1953 kHz        1953000 <-- Works best
+      # 1953 kHz        1953000 
       # 976 kHz         976000
       # 488 kHz         488000
       # 244 kHz         244000
@@ -205,14 +205,17 @@ def main():
                #print(data)
 
          else:
-            # Read a byte from SPI 
+            # Read 2 bytes over SPI 
             spiData[lowByte] = spi.xfer([0x0])[0]
+
+            # Low byte shouldn't be 0, so keep transferring until it's not
             while (spiData[lowByte] == 0):
                spiData[lowByte] = spi.xfer([0x0])[0]
 
-            spiData[highByte] = spi.xfer([0x0])[0]
-            while(spiData[highByte] == 0):
-               spiData[highByte] = spi.xfer([0x0])[0]
+            # Ensure the 15th bit isn't set
+            spiData[highByte] = spi.xfer([0x0])[0] & 0x7F
+            #while(spiData[highByte] == 0):
+            #   spiData[highByte] = spi.xfer([0x0])[0]
 
             # If the value is greater than the max 12-bit value, then the high 
             # byte and low byte need to be swapped
