@@ -21,7 +21,10 @@ class KillHandler:
    def handleKill(self, signum, frame):
       # Tell the program that it has been killed, so that it can exit 
       # gracefully when it gets a chance
-      self.killed = True
+      self.killed=True
+   
+   def killSelf(self):
+      self.killed=True
 
    def isKilled(self):
       return self.killed
@@ -83,6 +86,10 @@ def main():
       metavar="outputFile", default="data", type=argparse.FileType('w'),
       help="File where collected data will be written to. Default='data'")
 
+   parser.add_argument("--inputFile", dest="inputFile", nargs='?',
+      metavar="inputFile", type=argparse.FileType('r'),
+      help="Input file that contains ADC values formatted in a .csv file") 
+
    args = parser.parse_args()
 
    lowerBound = args.lowerBound
@@ -116,6 +123,20 @@ def main():
    repeatingValues = 0
    maxRepeatingValues = args.maxRepeats
 
+   # Open if the input file (if it's being used)
+   inputFile = args.inputFile
+
+   # If the input file is being used, then set a flag so that we don't use SPI
+   if (not (inputFile is None)):
+      useInputFile = True
+      
+      # The first line of the file will also just have meta data, so we can 
+      # read it here and ignore it
+      inputFile.readline()
+
+   else:
+      useInputFile = False
+      
    processData = True
 
 
@@ -167,6 +188,21 @@ def main():
          if (useRand == True):
             # Get random values
             data = random.randint(lowerBound, upperBound + 1)
+
+         # If we're reading input from a file, then do that instead of SPI or random values
+         elif (useInputFile):
+            # Read a line from the file
+            fileLine = inputFile.readline()
+
+            # If nothing was return, then we're at the end of the file and can stop reading
+            if (fileLine == ""):
+               killHandler.killSelf()
+               print("end of file")
+            
+            # Otherwise parse the line from the file
+            else:
+               data = int(fileLine.split(",")[1])
+               #print(data)
 
          else:
             # Read a byte from SPI 
